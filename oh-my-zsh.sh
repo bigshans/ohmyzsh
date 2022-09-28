@@ -1,3 +1,4 @@
+#!/bin/zsh
 # Protect against non-zsh execution of Oh My Zsh (use POSIX syntax here)
 [ -n "$ZSH_VERSION" ] || {
   # ANSI formatting function (\033[<code>m)
@@ -145,12 +146,18 @@ unset zcompdump_revision zcompdump_fpath zcompdump_refresh
 
 # Load all of the config files in ~/oh-my-zsh that end in .zsh
 # TIP: Add files you don't want in git to .gitignore
-for config_file ("$ZSH"/lib/*.zsh); do
-  custom_config_file="$ZSH_CUSTOM/lib/${config_file:t}"
-  [[ -f "$custom_config_file" ]] && config_file="$custom_config_file"
-  source "$config_file"
-done
-unset custom_config_file
+if (( ${+WHITELIST_OMZ} )); then
+    for config_file ($WHITELIST_OMZ); do
+        source "$ZSH"/lib/"$config_file".zsh
+    done
+else
+    for config_file ("$ZSH"/lib/*.zsh); do
+        custom_config_file="$ZSH_CUSTOM/lib/${config_file:t}"
+        [[ -f "$custom_config_file" ]] && config_file="$custom_config_file"
+        source "$config_file"
+    done
+    unset custom_config_file
+fi
 
 # Load all of the plugins that were defined in ~/.zshrc
 for plugin ($plugins); do
